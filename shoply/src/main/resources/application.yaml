@@ -1,0 +1,52 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+
+spring:
+
+  application:
+    name: shoply
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOSTNAME}:${MYSQL_PORT}/${MYSQL_DATABASE_NAME}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.MySQLDialect
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+    show-sql: true
+    open-in-view: false
+
+  main:
+    banner-mode: off
+
+spring-doc:
+  swagger-ui:
+    enabled: true
+    # localhost:8080/api/swagger-ui.html
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.project.shoply: info
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework: info
+
+# CUSTOM PROPERTIES
+
+application:
+  security:
+    jwt:
+      tokenType: Bearer
+      secret-key: WS27AFx7dmB8OEueK6RW5F5C51MwDH57CoI6NDgZCBJ2306qBZISUL3KYaF9RM67
+      expiration: 86400000 # millisecondi -> 1 giorno
