@@ -61,8 +61,7 @@ public class BrandController {
         return ResponseEntity.ok(brandService.updateBrand(newBrandName, brandId));
     }
 
-    @GetMapping("v1/brands")
-    @PreAuthorize("hasAnyAuthority('OPERATOR')")
+    @GetMapping("v0/brands")
     @Operation(
             summary = "Lista dei brand",
             description = "Resistuisce la lista dei brand presenti nel database, in caso non ce ne siano restituisce []."

@@ -61,8 +61,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.updateCategory(newCategoryName,categoryId));
     }
 
-    @GetMapping("v1/categories")
-    @PreAuthorize("hasAnyAuthority('OPERATOR')")
+    @GetMapping("v0/categories")
     @Operation(
             summary = "Lista delle categorie",
             description = "Resistuisce la lista delle categorie presenti nel database, in caso non ce ne siano restituisce []."
