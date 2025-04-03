@@ -101,7 +101,7 @@ public class ProductService {
         return "updated price";
     }
 
-    @Transactional
+    /*@Transactional
     protected void reduceProductStock(List<CartView> cartItems) {
         for (CartView cartItem : cartItems) {
             int updatedRows = productRepository.reduceStock(cartItem.getProductId(), cartItem.getQuantity());
@@ -117,6 +117,35 @@ public class ProductService {
         for (OrderItem orderItem : orderItems) {
             productRepository.addStock(orderItem.getProduct().getId(), orderItem.getQuantity());
         }
+    }*/
+
+    @Transactional
+    protected void reduceProductStock(List<CartView> cartItems) {
+        List<Long> productIds = new ArrayList<>();
+        int totalQuantity = 0;
+
+        for (CartView cartItem : cartItems) {
+            productIds.add(cartItem.getProductId());
+            totalQuantity += cartItem.getQuantity();
+        }
+
+        int updatedRows = productRepository.reduceStockBulk(productIds, totalQuantity);
+        if (updatedRows < productIds.size()) {
+            throw new GenericException("Non c'è abbastanza stock per alcuni prodotti", HttpStatus.CONFLICT);
+        }
+    }
+
+    @Transactional
+    protected void addProductStock(List<OrderItem> orderItems) {
+        List<Long> productIds = new ArrayList<>();
+        int totalQuantity = 0;
+
+        for (OrderItem orderItem : orderItems) {
+            productIds.add(orderItem.getProduct().getId());
+            totalQuantity += orderItem.getQuantity();
+        }
+
+        productRepository.addStockBulk(productIds, totalQuantity);
     }
 
     public Integer getRatingProduct(Long productId) {
