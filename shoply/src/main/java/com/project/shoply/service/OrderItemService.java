@@ -6,6 +6,7 @@ import com.project.shoply.entity.Product;
 import com.project.shoply.entity.view.CartView;
 import com.project.shoply.exception.GenericException;
 import com.project.shoply.exception.ResourceNotFoundException;
+import com.project.shoply.payload.response.OrderItemResponse;
 import com.project.shoply.repository.OrderItemRepository;
 import com.project.shoply.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -71,5 +72,17 @@ public class OrderItemService {
         List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
         productService.addProductStock(orderItems);
         orderItemRepository.deleteAll(orderItems);
+    }
+
+    protected List<OrderItemResponse> findAllOrderItemsResponseByOrderId(long orderId){
+        return orderItemRepository.findAllOrderItemsResponseByOrderId(orderId);
+    }
+
+    protected List<OrderItem> findAllOrderItemsByOrderId(Set<Long> orderIds){
+        return orderItemRepository.findAllOrderItemsResponseByOrderId(orderIds);
+    }
+
+    protected List<OrderItem> findAllByOrderId(long orderId){
+        return orderItemRepository.findAllByOrderId(orderId);
     }
 }

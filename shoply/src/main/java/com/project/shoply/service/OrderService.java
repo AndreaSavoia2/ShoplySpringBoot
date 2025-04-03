@@ -1,12 +1,16 @@
 package com.project.shoply.service;
 
 import com.project.shoply.entity.Order;
+import com.project.shoply.entity.OrderItem;
+import com.project.shoply.entity.Product;
 import com.project.shoply.entity.User;
 import com.project.shoply.entity.enumerated.OrderStatus;
 import com.project.shoply.entity.view.CartView;
 import com.project.shoply.exception.GenericException;
 import com.project.shoply.exception.ResourceNotFoundException;
 import com.project.shoply.payload.request.OrderRequest;
+import com.project.shoply.payload.response.OrderItemResponse;
+import com.project.shoply.payload.response.OrderResponse;
 import com.project.shoply.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,9 @@ public class OrderService {
         orderRepository.save(order);
 
         List<CartView> cartItems = cartService.findAllByUserId(userDetails);
+        if (cartItems.isEmpty())
+            throw new GenericException("cart not have items",HttpStatus.BAD_REQUEST);
+
         orderItemService.addItemToOrder(cartItems, order);
         return "Order created";
     }
@@ -56,8 +63,54 @@ public class OrderService {
         return "Order cancelled";
     }
 
+    public OrderResponse getOrderDetails(UserDetails userDetails, long orderId){
+        User user = (User) userDetails;
+
+        Order order = findOrderById(orderId);
+        if (order.getUser().getId() != user.getId())
+            throw new GenericException(
+                    "Order ownership conflict: the order does not belong to the specified user.",
+                    HttpStatus.FORBIDDEN);
+
+        List<OrderItemResponse> orderItemsResponse = orderItemService.findAllOrderItemsResponseByOrderId(orderId);
+
+        return OrderResponse.builder()
+                .orderId(order.getId())
+                .shippingAddress(order.getShippingAddress())
+                .status(order.getStatus())
+                .orderItems(orderItemsResponse)
+                .build();
+    }
+
+/*    public List<OrderResponse> getAllOrderByUser(UserDetails userDetails){
+        User user = (User) userDetails;
+
+        List<Order> orders = findOrderByUserId(user.getId());
+
+        Set<Long> ordersIds = new HashSet<>();
+        for (Order order : orders) {
+            ordersIds.add(order.getId());
+        }
+        Iterable<OrderItem> orderItems = orderItemService.findAllOrderItemsByOrderId(ordersIds);
+
+        Map<Long, OrderItemResponse> productsMap = new HashMap<>();
+        for (OrderItem orderItem : orderItems) {
+            productsMap.put(orderItem.getOrder().getId(),
+                    new OrderItemResponse(
+                            orderItem.getId(),
+                            orderItem.getQuantity(),
+                            orderItem.getPrice(),
+                            orderItem.getProduct())
+            );
+        }
+    }*/
+
     protected Order findOrderById(long id){
         return orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
+    }
+
+    protected List<Order> findOrderByUserId(long userId){
+        return orderRepository.findAllByUserId(userId);
     }
 }
