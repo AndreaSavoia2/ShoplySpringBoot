@@ -53,7 +53,7 @@ public class UserService {
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
             throw new BadCredentialsException("Bad credentials");
         String jwt = jwtService.generateToken(user, user.getId());
-        long cartId = cartService.findCartById(user.getId()).getUser().getId();
+        long cartId = cartService.findCartByUserId(user.getId()).getUser().getId();
         return AuthenticationResponse.builder()
                 .id(user.getId())
                 .username(username)
