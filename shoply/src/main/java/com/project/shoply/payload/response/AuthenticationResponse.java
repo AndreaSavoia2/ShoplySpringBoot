@@ -8,5 +8,6 @@ import lombok.Data;
 public class AuthenticationResponse {
     private long id;
     private String username;
+    private long cartId;
     private String token;
 }

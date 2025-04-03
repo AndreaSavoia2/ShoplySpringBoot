@@ -1,9 +1,6 @@
 package com.project.shoply.service;
 
-import com.project.shoply.entity.Brand;
-import com.project.shoply.entity.CartItem;
-import com.project.shoply.entity.Category;
-import com.project.shoply.entity.Product;
+import com.project.shoply.entity.*;
 import com.project.shoply.entity.view.CartView;
 import com.project.shoply.exception.GenericException;
 import com.project.shoply.exception.ResourceNotFoundException;
@@ -105,13 +102,20 @@ public class ProductService {
     }
 
     @Transactional
-    protected void updateProductStock(List<CartView> cartItems) {
+    protected void reduceProductStock(List<CartView> cartItems) {
         for (CartView cartItem : cartItems) {
             int updatedRows = productRepository.reduceStock(cartItem.getProductId(), cartItem.getQuantity());
             if (updatedRows == 0) {
                 throw new GenericException("There is not enough stock for the product with id: "
                         + cartItem.getProductId(), HttpStatus.CONFLICT);
             }
+        }
+    }
+
+    @Transactional
+    protected void addProductStock(List<OrderItem> orderItems) {
+        for (OrderItem orderItem : orderItems) {
+            productRepository.addStock(orderItem.getProduct().getId(), orderItem.getQuantity());
         }
     }
 

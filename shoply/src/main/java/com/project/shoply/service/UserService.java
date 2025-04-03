@@ -8,6 +8,7 @@ import com.project.shoply.payload.response.AuthenticationResponse;
 import com.project.shoply.repository.AuthorityRepository;
 import com.project.shoply.repository.UserRepository;
 import com.project.shoply.security.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -52,9 +53,11 @@ public class UserService {
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
             throw new BadCredentialsException("Bad credentials");
         String jwt = jwtService.generateToken(user, user.getId());
+        long cartId = cartService.findCartById(user.getId()).getUser().getId();
         return AuthenticationResponse.builder()
                 .id(user.getId())
                 .username(username)
+                .cartId(cartId)
                 .token(jwt)
                 .build();
     }

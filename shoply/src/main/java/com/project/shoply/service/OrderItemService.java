@@ -8,6 +8,7 @@ import com.project.shoply.exception.GenericException;
 import com.project.shoply.exception.ResourceNotFoundException;
 import com.project.shoply.repository.OrderItemRepository;
 import com.project.shoply.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -62,6 +63,13 @@ public class OrderItemService {
 
         orderItemRepository.saveAll(orderItems);
         cartItemService.deleteAllByUserId(order.getUser().getId());
-        productService.updateProductStock(orderedProducts);
+        productService.reduceProductStock(orderedProducts);
+    }
+
+    @Transactional
+    protected void deleteOrderItemsByOrderId(long orderId){
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
+        productService.addProductStock(orderItems);
+        orderItemRepository.deleteAll(orderItems);
     }
 }

@@ -8,6 +8,7 @@ import com.project.shoply.exception.GenericException;
 import com.project.shoply.exception.ResourceNotFoundException;
 import com.project.shoply.repository.WishlistItemRepository;
 import com.project.shoply.repository.WishlistRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.DisabledException;
@@ -49,6 +50,7 @@ public class WishlistItemService {
     }
 
     // rimozione di un elemento dalla wishlist
+    @Transactional
     public String removeWishlistItem(long wishlistItemId, UserDetails userDetails) {
         User user = (User) userDetails;
         long userId = user.getId();
