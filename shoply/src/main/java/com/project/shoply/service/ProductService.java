@@ -11,6 +11,10 @@ import com.project.shoply.repository.CartItemRepository;
 import com.project.shoply.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
@@ -29,8 +33,22 @@ public class ProductService {
 
     private final CartItemRepository cartItemRepository;
 
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.getAllProducts();
+    public Map<String, Object> getAllProducts(int pageNumber, int pageSize, String sortBy, String direction) {
+        Pageable pageable = PageRequest.of(
+                pageNumber,
+                pageSize,
+                Sort.Direction.valueOf(direction.toUpperCase()),
+                sortBy);
+
+        Page<ProductResponse> products = productRepository.getAllProducts(pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", products.getContent());
+        response.put("totalPages", products.getTotalPages());
+        response.put("totalElements", products.getTotalElements());
+        response.put("currentPage", products.getNumber());
+
+        return response;
     }
 
     public ProductDetailsResponse getProductDetailsByProductId(Long productId) {
@@ -100,24 +118,6 @@ public class ProductService {
         product.setPrice(newPrice);
         return "updated price";
     }
-
-    /*@Transactional
-    protected void reduceProductStock(List<CartView> cartItems) {
-        for (CartView cartItem : cartItems) {
-            int updatedRows = productRepository.reduceStock(cartItem.getProductId(), cartItem.getQuantity());
-            if (updatedRows == 0) {
-                throw new GenericException("There is not enough stock for the product with id: "
-                        + cartItem.getProductId(), HttpStatus.CONFLICT);
-            }
-        }
-    }
-
-    @Transactional
-    protected void addProductStock(List<OrderItem> orderItems) {
-        for (OrderItem orderItem : orderItems) {
-            productRepository.addStock(orderItem.getProduct().getId(), orderItem.getQuantity());
-        }
-    }*/
 
     @Transactional
     protected void reduceProductStock(List<CartView> cartItems) {

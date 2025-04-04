@@ -3,6 +3,8 @@ package com.project.shoply.repository;
 import com.project.shoply.entity.Product;
 import com.project.shoply.payload.response.ProductDetailsResponse;
 import com.project.shoply.payload.response.ProductResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "p.imageUrl," +
             "p.stock" +
             ") FROM Product p WHERE p.active = true")
-    List<ProductResponse> getAllProducts();
+    Page<ProductResponse> getAllProducts(Pageable pageable);
 
     @Query("SELECT new com.project.shoply.payload.response.ProductDetailsResponse( " +
             "p.id," +

@@ -15,4 +15,11 @@ public class OrderResponse {
     private String shippingAddress;
     private OrderStatus status;
     private List<OrderItemResponse> orderItems;
+
+    public OrderResponse(long orderId, String shippingAddress, OrderStatus status, List<OrderItemResponse> orderItems) {
+        this.orderId = orderId;
+        this.shippingAddress = shippingAddress;
+        this.status = status;
+        this.orderItems = orderItems;
+    }
 }

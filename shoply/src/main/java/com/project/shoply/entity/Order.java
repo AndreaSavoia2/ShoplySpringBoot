@@ -29,7 +29,7 @@ public class Order extends CreationUpdate {
     private String shippingAddress;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 10, nullable = false, unique = true)
+    @Column(length = 10, nullable = false)
     private OrderStatus status;
 
     @ManyToOne

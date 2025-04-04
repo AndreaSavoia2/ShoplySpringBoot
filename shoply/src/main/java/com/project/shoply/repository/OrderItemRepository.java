@@ -15,11 +15,11 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             "oi.quantity," +
             "oi.price," +
             "oi.product) " +
-            "FROM OrderItem oi WHERE oi.order = :orderId")
+            "FROM OrderItem oi WHERE oi.order.id = :orderId")
     List<OrderItemResponse> findAllOrderItemsResponseByOrderId(long orderId);
 
-    @Query("SELECT oi FROM OrderItem oi WHERE oi.order in :orderItemsIds")
-    List<OrderItem> findAllOrderItemsResponseByOrderId(Set<Long> orderItemsIds);
+    @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id IN :orderIds")
+    List<OrderItem> findAllByOrderIds(Set<Long> orderIds);
 
     List<OrderItem> findAllByOrderId(long orderId);
 

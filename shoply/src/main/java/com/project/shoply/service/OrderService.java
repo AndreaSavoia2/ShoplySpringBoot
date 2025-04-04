@@ -82,35 +82,56 @@ public class OrderService {
                 .build();
     }
 
-/*    public List<OrderResponse> getAllOrderByUser(UserDetails userDetails){
+    public List<OrderResponse> getAllOrderByUser(UserDetails userDetails) {
         User user = (User) userDetails;
 
-        List<Order> orders = findOrderByUserId(user.getId());
+        // Recupero tutti gli ordini dell'utente
+        List<Order> orders = findOrdersByUserId(user.getId());
 
-        Set<Long> ordersIds = new HashSet<>();
+        // Estraggo gli ID degli ordini
+        Set<Long> orderIds = new HashSet<>();
         for (Order order : orders) {
-            ordersIds.add(order.getId());
+            orderIds.add(order.getId());
         }
-        Iterable<OrderItem> orderItems = orderItemService.findAllOrderItemsByOrderId(ordersIds);
 
-        Map<Long, OrderItemResponse> productsMap = new HashMap<>();
+        List<OrderItem> orderItems = orderItemService.findAllByOrderIds(orderIds);
+
+        // Mappo gli OrderItem per ordine
+        Map<Long, List<OrderItemResponse>> orderItemsMap = new HashMap<>();
         for (OrderItem orderItem : orderItems) {
-            productsMap.put(orderItem.getOrder().getId(),
-                    new OrderItemResponse(
-                            orderItem.getId(),
-                            orderItem.getQuantity(),
-                            orderItem.getPrice(),
-                            orderItem.getProduct())
+            Long orderId = orderItem.getOrder().getId();
+
+            // Se la chiave non esiste, la inizializzo
+            if (!orderItemsMap.containsKey(orderId)) {
+                orderItemsMap.put(orderId, new ArrayList<>());
+            }
+
+            // Aggiungiamo l'item alla lista corrispondente all'ordine
+            orderItemsMap.get(orderId).add(
+                    new OrderItemResponse(orderItem.getId(), orderItem.getQuantity(), orderItem.getPrice(), orderItem.getProduct())
             );
         }
-    }*/
+
+        // Creo la lista di risposte
+        List<OrderResponse> responses = new ArrayList<>();
+        for (Order order : orders) {
+            List<OrderItemResponse> items = orderItemsMap.get(order.getId());
+            if (items == null) {
+                items = new ArrayList<>();
+            }
+            responses.add(new OrderResponse(order.getId(), order.getShippingAddress(),order.getStatus(), items));
+        }
+
+        return responses;
+    }
+
 
     protected Order findOrderById(long id){
         return orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
     }
 
-    protected List<Order> findOrderByUserId(long userId){
+    protected List<Order> findOrdersByUserId(long userId){
         return orderRepository.findAllByUserId(userId);
     }
 }

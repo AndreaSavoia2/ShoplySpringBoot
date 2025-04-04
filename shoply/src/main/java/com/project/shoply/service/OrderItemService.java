@@ -78,8 +78,8 @@ public class OrderItemService {
         return orderItemRepository.findAllOrderItemsResponseByOrderId(orderId);
     }
 
-    protected List<OrderItem> findAllOrderItemsByOrderId(Set<Long> orderIds){
-        return orderItemRepository.findAllOrderItemsResponseByOrderId(orderIds);
+    protected List<OrderItem> findAllByOrderIds(Set<Long> orderIds){
+        return orderItemRepository.findAllByOrderIds(orderIds);
     }
 
     protected List<OrderItem> findAllByOrderId(long orderId){

@@ -24,10 +24,21 @@ public class ProductController {
     @GetMapping("v0/products")
     @Operation(
             summary = "Recupera tutti i prodotti",
-            description = "Restituisce un elenco di tutti i prodotti disponibili nel sistema che non siano stati disattivati."
+            description = "Restituisce un elenco di tutti i prodotti disponibili nel sistema che non siano stati disattivati.",
+            parameters = {
+                    @Parameter(name = "pageNumber", description = "Numero della pagina da cui partire (default: 0)", required = false),
+                    @Parameter(name = "pageSize", description = "Numero di elementi per pagina (default: 10)", required = false),
+                    @Parameter(name = "name", description = "Colonna su cui eseguire l'ordinamento (default: name)", required = false),
+                    @Parameter(name = "direction", description = "Direzione dell'ordinamento: ASC o DESC (default: DESC)", required = false)
+            }
     )
-    public ResponseEntity<?> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<?> getAllProducts(
+            @RequestParam(defaultValue = "0") int pageNumber, //numero di pagina da partire
+            @RequestParam(defaultValue = "10") int pageSize, // numero di elementi per pagina
+            @RequestParam(defaultValue = "name") String name, // indica la colonna su cui eseguire l'ordinamento
+            @RequestParam(defaultValue = "DESC") String direction // indica se l'ordinamento e asc o desc
+    ) {
+        return ResponseEntity.ok(productService.getAllProducts(pageNumber,pageSize,name,direction));
     }
 
     @GetMapping("v0/products/{productId}")
